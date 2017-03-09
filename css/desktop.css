@@ -71,18 +71,19 @@ input {
     text-align: left;
     margin: 0 auto;
     width: calc(100% - 2rem);
-    max-width: 900px;
+    /*max-width: 900px;*/
     /*height: calc(100% - 200px);*/
     /*height: 200px;*/
+    height: calc(100vh-2rem);
     max-height: 600px;
-    margin-top: -1rem;
+    /*margin-top: -1rem;*/
     padding: 1rem;
 
 }
 
 #info {
     display: inline-block;
-    width: calc(300px - 3rem);
+    width: calc(200px - 3rem);
     margin-left: 1rem;
 }
 
@@ -98,15 +99,17 @@ input {
 #vis {
     display: inline-block;
     margin: none;
-    width: calc(100% - 300px);
+    width: calc(100% - 200px);
+    height: calc(100vh - 2rem);
+    max-height: 600px;
     float: left;
 }
 
-#vis:after {
+/*#vis:after {
     padding-top: 100%;
     display: block;
     content: '';
-}
+}*/
 
 #vis canvas {
     position: absolute;
