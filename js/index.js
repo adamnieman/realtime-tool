@@ -2,11 +2,7 @@ var index = {
 
 }
 
-index.gas_density_lookup = {
-	//all densities in kg/m^3
-	"carbon dioxide": 1.87,
-	"methane": 0.656,
-}
+index.gas_lookup;
 
 
 index.Rate = function (_rate_kg_s, _gas) {
@@ -44,13 +40,13 @@ index.Rate = function (_rate_kg_s, _gas) {
 			_gas = "carbon dioxide";
 		}
 
-		if (debug.sentinel(index.gas_density_lookup.hasOwnProperty(_gas), "No available density for '"+_gas+"'. Default gas 'carbon dioxide' will be used instead.")) {
+		if (debug.sentinel(index.gas_lookup.hasOwnProperty(_gas), "No available density for '"+_gas+"'. Default gas 'carbon dioxide' will be used instead.")) {
 			alert ("No available density for '"+_gas+"'. Default gas 'carbon dioxide' will be used instead.");
 			_gas = "carbon dioxide";
 		}
 
 		gas.name = _gas;
-		gas.kg_m3 = index.gas_density_lookup[gas.name];
+		gas.kg_m3 = index.gas_lookup[gas.name].density;
 
 		rate.kg_s = _rate_kg_s;
 		rate.m3_s = rate.kg_s/gas.kg_m3;

@@ -3,6 +3,7 @@ var input = {
 	//"dbLoadHandler",
 	//"displayHandler",
 	//"tooltipHandler",
+	"setupHandler",
 	"infoHandler",
 	"colladaLoadHandler",
 	"resizeHandler",

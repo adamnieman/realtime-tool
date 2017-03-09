@@ -1,6 +1,6 @@
 function colladaLoadHandler (sb) {
 
-	var objects = [
+	/*var objects = [
 		{	
 			name: "human",
 			path: "assets/models/human.dae",
@@ -14,7 +14,7 @@ function colladaLoadHandler (sb) {
 			height: 4.3,
 			model: null,
 		}
-	];
+	];*/
 
 	function INIT () {
 		sb.listen({
@@ -25,21 +25,41 @@ function colladaLoadHandler (sb) {
 	}
 
 	function MODELHANDLER (d) {
-
 		clear(d.parent);
-		var object = selectObject(d.base_m)
+		var object = select_object(d.base_m);
 		debug.log("Model selected: '"+object.name+"'.");
 
 		load(object, function (model) {
+
 			position(model, d.base_m);
 			d.parent.add(model)
 		})
+
 	}
 
 	function clear (group) {
 		while (group.children.length > 0) {
 			group.remove(group.children[0])
 		};
+	}
+
+	function select_object (base_m) {
+
+		var min_diff = Infinity;
+		var object = null;
+
+		var i;
+		var l = sb.settings.scaling_objects.length;
+
+		for (i=0; i<l; i++) {
+			var diff = Math.abs((base_m*0.25)-sb.settings.scaling_objects[i].height);
+			if (!object || diff < min_diff) {
+				min_diff = diff;
+				object = sb.settings.scaling_objects[i];
+			}
+		}
+
+		return object;
 	}
 
 	function position (model, base) {
@@ -55,46 +75,24 @@ function colladaLoadHandler (sb) {
 		model.position.z = (0 - offsetZ)+(base/4);
 	}
 
-	function selectObject (base) {
-
-		var minDiff = Infinity;
-		var object = null
-
-		var i;
-		var l = objects.length;
-
-		for (i=0; i<l; i++) {
-			var diff = Math.abs((base*0.25)-objects[i].height);
-			//the below selects larger scaling objects slightly earlier on
-			//var diff = Math.abs((base*0.3)-objects[i].height);
-
-			//var diff = base-objects[i].distance >= 0 ? base-objects[i].distance : Infinity;
-			if (!object ||
-				diff < minDiff) {
-				minDiff = diff;
-				object = objects[i];
-			}
-		}
-
-		return object;
-	}
 
 	function load (object, callback) {
 		var loader = new THREE.ColladaLoader();
 
-		loader.load(object.path, function (result) {
-			object.model = result.scene.children[0].clone();
-			object.model.rotation.x = -Math.PI/2
-			object.model.rotation.z = Math.PI/4
-			object.model.castShadow = true;
 
-			if (object.name === "human") {
-				changeMaterial (object.model.children, sb.three.materials.model);
+		loader.load(object.path, function (result) {
+			var model = result.scene.children[0].clone();
+			model.rotation.x = -Math.PI/2
+			model.rotation.z = Math.PI/4
+			model.castShadow = true;
+
+			if (object.name === "person") {
+				changeMaterial (model.children, sb.three.materials.model);
 			}
-			makeCorrectSize (object.model, object.height);
-			giveShadow (object.model.children);
-			object.distance = getGreatestDistance (object.model);
-			callback(object.model);
+			makeCorrectSize (model, object.height);
+			giveShadow (model.children);
+			object.distance = getGreatestDistance(model);
+			callback(model);
 		});
 	}
 
@@ -138,7 +136,7 @@ function colladaLoadHandler (sb) {
 	}
 
 	function makeCorrectSize (object, correctHeight){
-		        	
+
 		var bBox = new THREE.Box3().setFromObject(object);
 		var currentHeight = bBox.max.y - bBox.min.y
 		var scale = (1/currentHeight) * correctHeight		
@@ -153,7 +151,7 @@ function colladaLoadHandler (sb) {
 	function DESTROY () {
 		sb.unlisten(this.moduleID)
 		objects = null;
-		makeCorrectSize, changeMaterial, giveShadow, selectObject, clear, position, load = null;
+		makeCorrectSize, changeMaterial, giveShadow, select_object, clear, position, load = null;
 	}
 
 	return {

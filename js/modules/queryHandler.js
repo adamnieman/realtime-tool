@@ -2,7 +2,7 @@ function queryHandler (sb) {
 
 	function INIT () {
 		sb.listen({
-			listenFor: ["checks-complete"],
+			listenFor: ["setup-complete"],
 			moduleID: this.moduleID,
 			moduleFunction: "getInput"
 		})
