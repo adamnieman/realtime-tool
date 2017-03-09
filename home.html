@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Vollkorn">
+  
+		<link rel="stylesheet" type="text/css" href="css/reset.css">
+		<link rel="stylesheet" type="text/css" href="css/desktop.css">
+		<script src = "js/libs/d3.js"></script>
+		<script src = "js/libs/three.js"></script>
+		<script src = "js/libs/collada-loader.js"></script>
+		<script src = "js/debug.js"></script>
+		<script src = "js/index.js"></script>
+		<script src = "js/utility.js"></script>
+		<script src = "js/core.js"></script>
+	</head>
+	<body>
+	<div id = "mother" class = "vertically-centered-wrapper">
+		<div class = "vertically-centered">
+			<div id = "container">
+				<div id = "vis">
+				</div>
+				<div id = "info">
+					
+					<h1 id = "heading"></h1>
+					<h3 id = "subheading"></h3>
+					<h2>Rate</h2>
+					<p>mass <span class = "info-gas">placeholder gas</span>/s: <em id = "info-rate-mass">0 kg</em></p>
+					<p>volume <span class = "info-gas">placeholder gas</span>/s: <em id = "info-rate-volume">0 m3</em></p>
+					<h2>Each Sphere</h2>
+					<p>mass <span class = "info-gas">placeholder gas</span>: <em id = "info-sphere-mass">0 kg</em></p>
+					<p>volume <span class = "info-gas">placeholder gas</span>: <em id = "info-sphere-volume">0 m3</em></p>
+					<p>radius: <em id = "info-sphere-radius">0 m</em></p>
+					</br>
+					</br>
+					<p>Use this link to share your project:</p>
+					<input id = "share-link" type="text" value = "" readonly>
+
+					<p>This is a programmatically generated animation showing a realtime <span class = "info-gas">placeholder gas</span> emission rate.</p>
+					<a target = "_blank" href = "http://www.realworldvisuals.com"><img src = "assets/rwv-logo-2.svg"></a>
+
+
+				</div>
+			</div>
+		</div> 
+	</div>
+		
+	</body>
+</html>

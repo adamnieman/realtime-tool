@@ -1,0 +1,53 @@
+function infoHandler (sb) {
+
+	var info_gas = document.getElementsByClassName("info-gas");
+
+	var info_heading = document.getElementById("heading");
+	var info_subheading = document.getElementById("subheading");
+
+	var info_rate_mass = document.getElementById("info-rate-mass");
+	var info_rate_volume = document.getElementById("info-rate-volume");
+	var info_sphere_mass = document.getElementById("info-sphere-mass");
+	var info_sphere_volume = document.getElementById("info-sphere-volume");
+	var info_sphere_radius = document.getElementById("info-sphere-radius");
+	var share_link = document.getElementById("share-link");
+
+	function INIT () {
+		sb.listen({
+			listenFor: ["queries-complete"],
+			moduleID: this.moduleID,
+			moduleFunction: "appendInfo"
+		})
+	}
+
+	function APPENDINFO () {
+		var i;
+		var l = info_gas.length;
+		for (i=0; i<l; i++) {
+			info_gas[i].innerHTML = sb.rate.get_gas().name;
+		}
+
+		info_heading.innerHTML = sb.headings.main;
+		info_subheading.innerHTML = sb.headings.sub;
+
+		info_rate_mass.innerHTML = utility.converter.mass(sb.rate.get_rate().kg_s, 2);
+		info_rate_volume.innerHTML = utility.converter.volume(sb.rate.get_rate().m3_s, 2);
+
+		info_sphere_mass.innerHTML = utility.converter.mass(sb.rate.get_sphere().kg, 2);
+		info_sphere_volume.innerHTML = utility.converter.volume(sb.rate.get_sphere().m3, 2);
+		info_sphere_radius.innerHTML = utility.converter.length(sb.rate.get_sphere().r_m, 2);
+	
+		share_link.value = window.location.href
+	}
+	
+	function DESTROY () {
+		sb.unlisten(this.moduleID)
+		info_gas, info_heading, info_subheading, info_rate_mass, info_rate_volume, info_sphere_mass, info_sphere_volume, info_sphere_radius, share_link = null; 
+	}
+
+	return {
+        init : INIT,
+        appendInfo: APPENDINFO,
+        destroy : DESTROY
+    };
+}
