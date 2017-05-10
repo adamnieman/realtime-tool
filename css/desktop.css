@@ -44,6 +44,10 @@ input {
     margin-bottom: 1.5rem;
 }
 
+a {
+    color: #cccccc;
+}
+
 
 
 .vertically-centered-wrapper {

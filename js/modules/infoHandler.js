@@ -1,6 +1,8 @@
 function infoHandler (sb) {
 
 	var info_gas = document.getElementsByClassName("info-gas");
+	var info_density = document.getElementById("info-density");
+	var info_source = document.getElementById("info-source");
 
 	var info_heading = document.getElementById("heading");
 	var info_subheading = document.getElementById("subheading");
@@ -10,6 +12,7 @@ function infoHandler (sb) {
 	var info_sphere_mass = document.getElementById("info-sphere-mass");
 	var info_sphere_volume = document.getElementById("info-sphere-volume");
 	var info_sphere_radius = document.getElementById("info-sphere-radius");
+	
 	var share_link = document.getElementById("share-link");
 
 	function INIT () {
@@ -25,6 +28,13 @@ function infoHandler (sb) {
 		var l = info_gas.length;
 		for (i=0; i<l; i++) {
 			info_gas[i].innerHTML = sb.rate.get_gas().name;
+		}
+
+		info_density.innerHTML = sb.rate.get_gas().kg_m3;
+
+		if (index.gas_lookup[sb.rate.get_gas().name].source) {
+			info_source.href = index.gas_lookup[sb.rate.get_gas().name].source;
+			info_source.innerHTML = "source";
 		}
 
 		info_heading.innerHTML = sb.headings.main;

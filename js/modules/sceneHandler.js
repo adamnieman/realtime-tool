@@ -61,12 +61,18 @@ function sceneHandler (sb) {
 		sb.three.groups.secondary =  new THREE.Object3D();
 		sb.three.scene.add(sb.three.groups.secondary);
 
+		///MAKE THIS DO THE THING
+		var colour = index.gas_lookup[sb.rate.get_gas().name].colour;
+		if (debug.sentinel(colour && utility.isValidHex(colour), "No valid colour associated with '"+sb.rate.get_gas().name+"'. Using default.")) {
+			colour = "#00aeef";
+		}
+
 		//setup materials
 		sb.three.materials.plane = new THREE.MeshLambertMaterial({color: 0xf7f7f7});
 		sb.three.materials.model = new THREE.MeshBasicMaterial({color: 0x888888});
 		sb.three.materials.ghost = new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0});
 		sb.three.materials.sphere = new THREE.MeshPhongMaterial({
-			color: 0x00aeef, 
+			color: colour,//0x00aeef, 
 			transparent: true,
 			opacity: 0.65,
 			reflectivity: 1,

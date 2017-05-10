@@ -8,17 +8,25 @@
 			"name": "bus",
 			"path": "assets/models/double-decker-bus-4.dae",
 			"height": 4.3
+		}, {
+			"name": "liberty",
+			"path": "assets/models/liberty.dae",
+			"height": 92.9
+		}, {
+			"name": "eiffel",
+			"path": "assets/models/eiffel.dae",
+			"height": 300
 		}
 	],
 	"gases": {
 		"carbon dioxide": {
-			"density": 1.87,
-			"source": null,
-			"colour": null
+			"density": 1.8714,
+			"source": "https://encyclopedia.airliquide.com/carbon-dioxide",
+			"colour": null //provide colour in form of hex code "#000000"
 		},
 		"methane": {
-			"density": 0.656,
-			"source": "https://en.wikipedia.org/wiki/Methane",
+			"density": 0.6797,
+			"source": "https://encyclopedia.airliquide.com/methane",
 			"colour": null
 		}
 	}

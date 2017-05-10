@@ -23,8 +23,6 @@ function setupHandler (sb) {
 
 		sb.settings=data;
 
-		console.log(sb.settings);
-
 		sb.notify({
 			type : "setup-complete",
 			data: null

@@ -341,6 +341,11 @@ utility.converter = function () {
 	}
 } ()
 
+utility.isValidHex = function (colour) {
+	var result  = /^#[0-9A-F]{6}$/i.test(colour)
+	return result;
+}
+
 if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function(obj, start) {
 	     for (var i = (start || 0), j = this.length; i < j; i++) {
