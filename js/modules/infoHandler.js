@@ -1,5 +1,7 @@
 function infoHandler (sb) {
 
+	var seconds_per_year = 31556925.9936
+
 	var info_gas = document.getElementsByClassName("info-gas");
 	var info_density = document.getElementById("info-density");
 	var info_source = document.getElementById("info-source");
@@ -9,6 +11,8 @@ function infoHandler (sb) {
 
 	var info_rate_mass = document.getElementById("info-rate-mass");
 	var info_rate_volume = document.getElementById("info-rate-volume");
+	var info_annual_mass = document.getElementById("info-annual-mass");
+	var info_annual_volume = document.getElementById("info-annual-volume");
 	var info_sphere_mass = document.getElementById("info-sphere-mass");
 	var info_sphere_volume = document.getElementById("info-sphere-volume");
 	var info_sphere_radius = document.getElementById("info-sphere-radius");
@@ -51,6 +55,9 @@ function infoHandler (sb) {
 
 		info_rate_mass.innerHTML = utility.converter.mass(sb.rate.get_rate().kg_s, 2);
 		info_rate_volume.innerHTML = utility.converter.volume(sb.rate.get_rate().m3_s, 2);
+
+		info_annual_mass.innerHTML = utility.converter.mass(sb.rate.get_rate().kg_s*seconds_per_year, 2);
+		info_annual_volume.innerHTML = utility.converter.volume(sb.rate.get_rate().m3_s*seconds_per_year, 2);
 
 		info_sphere_mass.innerHTML = utility.converter.mass(sb.rate.get_sphere().kg, 2);
 		info_sphere_volume.innerHTML = utility.converter.volume(sb.rate.get_sphere().m3, 2);
