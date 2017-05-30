@@ -9,6 +9,11 @@ function setupHandler (sb) {
 	}
 
 	function LOADSETTINGS () {
+
+		/*
+		Initialises loading of setting stored in settings.json
+		*/
+
 		d3.json("settings.json", receive_settings)
 	}
 
@@ -17,9 +22,17 @@ function setupHandler (sb) {
 			return;
 		}
 
+		/*
+		Assigns gas data to a property of the index object where it will be used by the index.Rate class.
+		Removes gas data from the rest of settings where it is no longer needed.
+		*/
 		
 		index.gas_lookup = data.gases;
 		delete data.gases;
+
+		/*
+		Assigns settings data to a property of the sandbox where it will be accessible by all modules.
+		*/
 
 		sb.settings=data;
 

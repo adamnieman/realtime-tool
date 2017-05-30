@@ -9,6 +9,12 @@ function checkHandler (sb) {
 	}
 
 	function PERFORMCHECKS () {
+
+		/*
+		Checks whether browser supports WebGL and kills js execution if not.
+		Continues otherwise.
+		*/
+		
 		debug.check(!check_webgl(), "WebGL failed - visualisation cannot be generated");
 		
 		sb.notify({
@@ -26,7 +32,16 @@ function checkHandler (sb) {
 		    return 1;
 		} else {
 		    var canvas = document.createElement("canvas");
+		   // alert(canvas)
 		    var context = canvas.getContext("webgl");
+		   // alert(context)
+		   	if (!context) {
+		   		context = canvas.getContext("experimental-webgl");
+		   		if (context) {
+		   			debug.log("WebGL support is experimental.");
+		   		}
+		   	}
+
 		    if (!context) {
 		      // browser supports WebGL but initialization failed.
 		      // window.location = "http://get.webgl.org/troubleshooting";

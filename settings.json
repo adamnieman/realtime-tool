@@ -22,7 +22,7 @@
 		"carbon dioxide": {
 			"density": 1.8714,
 			"source": "https://encyclopedia.airliquide.com/carbon-dioxide",
-			"colour": null //provide colour in form of hex code "#000000"
+			"colour": null 
 		},
 		"methane": {
 			"density": 0.6797,

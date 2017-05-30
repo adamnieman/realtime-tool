@@ -9,13 +9,25 @@ function sceneSetup (sb) {
 	}
 
 	function CREATESCENE (d) {
+
+		/*
+		This code creates a THREE scene and returns references to all important scene elements in a structured object.
+		*/
+
+		/*
+		Checks that argument d contains an id, and a parent to append the scene to.
+		*/
+
 		if (debug.sentinel(d.id, "No valid id provided with scene request. Failed to initialise scene.") ||
 			debug.sentinel(d.parent, "No valid parent provided with scene request. Failed to initialise scene.")) {
 			return;
 		}
 
+
+		//create scene
 		var scene = new THREE.Scene();
 
+		//create camera
 		var camera = new THREE.PerspectiveCamera(30, d.w / d.h, 0.1, 10000000);
 			
 			camera.position.x = 3*0.8;
@@ -24,15 +36,18 @@ function sceneSetup (sb) {
 			camera.lookAt(new THREE.Vector3(0, 0, 0))
 			scene.add(camera);
 
+		//create renderer
 		var renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true, antialias: true });
 			renderer.setClearColor(new THREE.Color(0xeeeeee));
 			renderer.setSize(d.w, d.h);
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+		//create axes
 		var axes = new THREE.AxisHelper(100);
 			//scene.add(axes);
 
+		//create directional lighting
 		var directionlight = new THREE.DirectionalLight( 0xffffff );
 			directionlight.position.set( 10, 10, 10 );
 			directionlight.target.position.set(5,5,5);
@@ -41,23 +56,13 @@ function sceneSetup (sb) {
 			directionlight.shadow.camera.far= 50;
 			scene.add(directionlight);
 
-		var spotlight = new THREE.SpotLight(0xffffff);
-			//spotlight.position.set(100, 100, 0);
-			//spotlight.castShadow = true;
-			//spotlight.shadow.camera.near = 0.01;
-			//spotlight.shadow.camera.far= 10000000;
-			//scene.add(spotlight);
-
-		var hemilight = new THREE.HemisphereLight( 0xffffff, 0xf7f7f7, 0.2 ); 
-			//scene.add(hemilight);
-
-		var ambientlight = new THREE.AmbientLight(0xffffff, 0.1)
-			//scene.add(ambientlight);
-
+		//append renderer to the parent dom element
 		d.parent.appendChild(renderer.domElement);
 
+		/*
+		Creates resize function and adds to sb.resize to be called when "resize" notification is fired.
+		*/
 		sb.resize.push(function() {
-			//sb.w and sb.h 
 			camera.aspect = sb.w / sb.h;
     		camera.updateProjectionMatrix();
 
@@ -70,7 +75,6 @@ function sceneSetup (sb) {
 			camera: camera,
 			renderer: renderer,
 			lights: {
-				spot: spotlight,
 				directional: directionlight,
 			},
 			groups: {

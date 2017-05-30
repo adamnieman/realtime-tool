@@ -1,6 +1,10 @@
 function ready (sb) {
 
 	function INIT () {
+		/*
+		'ready' notification means that all modules have been loaded and initialised, and are ready to be run.
+		*/
+
 		notify ("ready")
 	}
 

@@ -16,6 +16,11 @@ function sceneHandler (sb) {
 	}
 
 	function REQUESTSCENE () {
+
+		/*
+		Makes a request for a THREE scene
+		*/
+
 		sb.notify({
 			type : "create-scene",
 			data: {
@@ -28,28 +33,58 @@ function sceneHandler (sb) {
 	}
 
 	function RECEIVESCENE (d) {
+
+		/*
+		Receives THREE scene. Check that it is intended for this module's use. Returns early if not.
+		*/
+
 		if (d.id != this.moduleID) {
 			return;
 		}
 
+		/*
+		Due to quirks with FireFox, creating a THREE.js scene results in so many console warn messages it's hard
+		to read actual debug messages. This reassigns console.warn to an empty function and stops anything from printing.
+		*/
+
 		console.warn = function () {};
+
+		/*
+		Assigns the returned scene to the sandbox
+		*/
 
 		sb.three = d;
 
-		var sphere_count_limit = 250;
-		var position_check_recursions = 15;
+		/*
+		Sets up values which will be used when generating the sphere-pile
+		*/
+
+		//number of soheres before the pile clears and starts again
+		var sphere_count_limit = 250; 
+
+		//number of positions each sphere will try before deciding on the best one
+		//a higher value will result in a more tightly packed (realistic) pile, but slower code
+		var position_check_recursions = 15; 
+
+		//gravity vector to simulate earth's
 		var gravity_vector = new THREE.Vector3(0, -9.8, 0);
 
-
+		//width (in spheres) of the base of the stack
 		var stack_base_count = 20
+
+		//width (in meters) of the base of the stack
 		var stack_base_m = sb.rate.get_sphere().r_m*stack_base_count;
 
+		//sphere geometry to be reused for each sohere instance
+		//the last 2 parameters refer to latitudinal and longitudinal segments
+		//higher values mean more realistic (rounder) spheres but significantly slower code
 		var sphere_geom = new THREE.SphereGeometry(sb.rate.get_sphere().r_m, 6, 4)
 
+		//these will hold the interval and timeout functions which control time between sphere launch and time between sphere clearing
 		var interval;
 		var timeout;
-		//setup groups
-		//model group
+
+		//model group - contains scaling object
 		sb.three.groups.model =  new THREE.Object3D();
 		sb.three.scene.add(sb.three.groups.model);
 
@@ -61,13 +96,20 @@ function sceneHandler (sb) {
 		sb.three.groups.secondary =  new THREE.Object3D();
 		sb.three.scene.add(sb.three.groups.secondary);
 
-		///MAKE THIS DO THE THING
+		/*
+		Checks if the visualised gas has a colour value associated with it (this would have been defined in settings).
+		If it does, checks that the colour is a valid hex code then uses that as the sphere colour.
+		If there is no colour, or the colour is invalid, uses a default value of "#00aeef" (light turquoise/blue).
+		*/
 		var colour = index.gas_lookup[sb.rate.get_gas().name].colour;
 		if (debug.sentinel(colour && utility.isValidHex(colour), "No valid colour associated with '"+sb.rate.get_gas().name+"'. Using default.")) {
 			colour = "#00aeef";
 		}
 
-		//setup materials
+		/*
+		Sets up materials for use in the scene.
+		The ghost material is an invisible material which will be applied to placeholder spheres used only for mesh collision.
+		*/
 		sb.three.materials.plane = new THREE.MeshLambertMaterial({color: 0xf7f7f7});
 		sb.three.materials.model = new THREE.MeshBasicMaterial({color: 0x888888});
 		sb.three.materials.ghost = new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0});
@@ -79,6 +121,9 @@ function sceneHandler (sb) {
 			envMap: loadCubemap()
 		})
 
+		/*
+		Requests scaling object.
+		*/
 		sb.notify({
 			type : "add-model",
 			data: {
@@ -87,7 +132,9 @@ function sceneHandler (sb) {
 			}
 		});
 
-		//add plane
+		/*
+		Sets up and adds plane.
+		*/
 		sb.three.plane = new THREE.Mesh (
 			new THREE.BoxGeometry(50, 1, 50), 
 			new THREE.MeshLambertMaterial({color: 0xfefefe})
@@ -108,19 +155,45 @@ function sceneHandler (sb) {
 
 		this._destroy = _DESTROY;
 
+		/*
+		Updates the position etc of the light, camera and plane to suit the scale of the sphere-pile.
+		*/
 		updateScene (stack_base_m);
+
+		/*
+		Begins the render loop.
+		*/
 		render();
+
+		/*
+		Begins sphere creation.
+		*/
 		createInterval()
 
 		function createInterval () {
+
+			/*
+			If sphere rate is zero, does not create any spheres and returns early.
+			*/
 			if (sb.rate.get_sphere().s_per === Infinity) {
 				debug.log("Zero spheres to be generated for a rate of 0 kg/s");
 				return;
 			}
 
+			//sphere_count is incremented every time a sphere is created
 			var sphere_count = 0;
+
+			/*
+			Removes any existing spheres (or ghost spheres) from scene.
+			*/
 			clearScene()
 
+
+			/*
+			Runs interval code to generates one sphere every <time between spheres>.
+			If sphere count is equal to or exceeding the sphere limit, lets spheres continue to fall and settle 
+			for 5 seconds before clearing the scene and restarting the sphere creation process.
+			*/
 			interval = setInterval(function () {
 				addSphere ();
 				sphere_count++;
@@ -132,13 +205,25 @@ function sceneHandler (sb) {
 		}
 
 		function addSphere () {
+
+			/*
+			Creates a sphere mesh
+			*/
 			var sphere = new THREE.Mesh(sphere_geom, sb.three.materials.sphere);
 			var r = sb.rate.get_sphere().r_m;
 			var b = stack_base_m;
 
+			/*
+			Gets all the vertices of that sohere and stores them in an array. 
+			Initialises an empty array vertices_array_south.
+			*/
 			var vertices_array = sphere.geometry.vertices
 			var vertices_array_south = []
 
+			/*
+			Iterates over all vertices in vertices_array and pushes all which are in the "southern hemisphere"
+			of the sphere into vertices_array_south
+			*/
 			var v;
 			var l = vertices_array.length;
 			for (v = 0; v < l; v++){
@@ -148,18 +233,37 @@ function sceneHandler (sb) {
 				}
 			}
 
+			//Stores the furthest distance sphere will be able to fall
 			var best_distance = 0;
+			//Stores the x,z co-ordinates at which the sphere will be able to fall best_distance
 			var best_option;
+			//Stores the height from which the sphere will be dropped
 			var drop_point = stack_base_m;
 
+			/*
+			Recurses position_check_recursions number of times, randomly generating x,z co-ordinates and then
+			seeing how far the sphere could fall directly downwards from that position. The furthest fall is stored
+			in best_distance, and the associated position in best_option. If a better position is found then these
+			values are overwritten.
+			*/
 			var k;
 			for (k = 0; k < position_check_recursions; k++){
-					
+				
 				var smallest_distance = Infinity
 				var x_pos = (Math.random()*(b-(r*2)))-(b/2)
 				var z_pos = (Math.random()*(b-(r*2)))-(b/2)
+				
+				/*
+				Sphere is moved into position from which to check fall distance
+				*/
 				sphere.position.set(x_pos, drop_point, z_pos)
-						
+				
+				/*
+				The fall distance of a sphere is worked out by casting rays down from each southern vertex of that sphere,
+				and checking the distance before that ray intersects another mesh. A sphere can only fall until its first 
+				vertex intersects something, so we store the smallest distance between a vertex and an intersection in the
+				variable smallest_distance
+				*/	
 				for (var w = 0; w < vertices_array_south.length; w++){
 							
 					var position = new THREE.Vector3(parseFloat(sphere.position.x+vertices_array_south[w].x), parseFloat(sphere.position.y+vertices_array_south[w].y), parseFloat(sphere.position.z+vertices_array_south[w].z))
@@ -174,7 +278,11 @@ function sceneHandler (sb) {
 					}
 								
 				}
-						
+				
+				/*
+				If the smallest_distance variable (ie the distance the sphere can fall before intersecting another mesh)
+				is greater than the current best_distance, both the best_distance and best_option variables are replaced
+				*/		
 				if (smallest_distance > best_distance){
 							
 					best_distance = smallest_distance
@@ -183,17 +291,34 @@ function sceneHandler (sb) {
 				}
 			}
 
+			/*
+			The sphere starts in the center of the base, just beneath the ground plane. 
+			It ends up below the drop-point, the furthest it is able to fall without intersecting the plane or
+			existing spheres.
+			*/
 			var start_point = new THREE.Vector3(0,-(r*2),0)
 			var end_point = new THREE.Vector3(best_option[0], drop_point-best_distance, best_option[1])
-				
+			
+			/*
+			The sphere is placed at the start position ready to be launched
+			*/	
 			sphere.position.x = start_point.x
 			sphere.position.y = start_point.y
 			sphere.position.z = start_point.z
 			sphere.receiveShadow = true;
 			sphere.castShadow = true;
-			//sphere.updateMatrixWorld()
+
+			/*
+			The sphere is added to the secondary group - this group is NOT used for raycasting/checking for intersections.
+			This is so there's no risk of raycasters thinking they have intersected a sphere before it is in its final position.
+			*/	
 			sb.three.groups.secondary.add(sphere)
 
+			/*
+			The code below creates a ghost sphere. This invisible sphere is placed at the point the main sphere will end up. 
+			The ghost sphere is added to the primary group - this group IS used for raycasting/checking for intersections.
+			This is so that whilst a sphere is in the air, other spheres will not think they can fall into its intended space.
+			*/	
 			var _sphere = new THREE.Mesh (sphere_geom, sb.three.materials.ghost)
 				_sphere.position.x = end_point.x
 				_sphere.position.y = end_point.y
@@ -201,9 +326,15 @@ function sceneHandler (sb) {
 				sb.three.groups.primary.add(_sphere)
 				
 				
-			
+			/*
+			This sets start to the time when the sphere is launched
+			*/	
 			var start = (new Date().getTime() / 1000)
 			
+
+			/*
+			This launches the sphere
+			*/	
 			launch (sphere, start_point, end_point, start);
 		}
 

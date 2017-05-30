@@ -24,6 +24,15 @@ function infoHandler (sb) {
 	}
 
 	function APPENDINFO () {
+
+		/*
+		Updates displayed information to reflect the visualised rate
+		*/
+
+		/*
+		Inserts the name of the visualised gas into every .info-gas element
+		*/
+		
 		var i;
 		var l = info_gas.length;
 		for (i=0; i<l; i++) {
