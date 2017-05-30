@@ -103,7 +103,9 @@ a {
 #vis {
     display: inline-block;
     margin: none;
-    width: calc(100% - 200px);
+    max-width: calc(100% - 200px);
+    width: calc(80%);
+    min-width: calc(100% - 350px);
     height: calc(100vh - 2rem);
     max-height: 600px;
     float: left;
